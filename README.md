@@ -3,28 +3,108 @@
 ## 🏢 Project Overview
 **Revolutionary, Comprehensive Human Resources Management System for TuloTech Africa**
 
-- **Organization**: TuloTech Africa
-- **First Company**: Swakopmund Christian Academy
+- **Organization**: TuloTech Africa (Super Administrator)
+- **Companies**: 
+  - Swakopmund Christian Academy (Namibia - Secondary Administrator)
+  - Cape Town International School (South Africa - Demo)
 - **Technology**: Hono Framework + Cloudflare Workers + D1 Database
-- **Architecture**: Multi-company, role-based access control system
+- **Architecture**: Multi-company, role-based access control system with regional tax compliance
+- **Regional Support**: Namibia & South Africa tax laws fully implemented
 
 ## ✨ Features Overview
 
 ### 🎯 Core Features
-- ✅ **Multi-Company Support** - Create and manage multiple independent companies
+- ✅ **Super Admin Control** - TuloTech Africa has full system authority
+- ✅ **Multi-Company Support** - Create and manage unlimited independent companies
+- ✅ **Regional Tax Compliance** - Namibia and South Africa tax laws implemented
+- ✅ **Automated Tax Calculations** - PAYE, SSC (Namibia), UIF, SDL (South Africa)
+- ✅ **Financial Year Management** - Year cycles, year-end processes
 - ✅ **Staff Management** - Complete employee lifecycle management
 - ✅ **Attendance Tracking** - Real-time clock-in/clock-out system
-- ✅ **Payslip Generation** - Automated salary calculations with PDF export
-- ✅ **Leave Management** - Request, approve, and track employee leave
+- ✅ **Payslip Generation** - Automated salary calculations with regional tax compliance
+- ✅ **Leave Management** - Request, approve, track with year-end rollover
 - ✅ **Calendar System** - Events, holidays, meetings, and deadlines
 - ✅ **Internal Communicator** - Messages, announcements, and notifications
 - ✅ **Policy Documents** - Centralized document repository
 - ✅ **Motivational Features** - Daily quotes and achievement tracking
-- ✅ **Role-Based Access** - Admin, Manager, and Staff portals
+- ✅ **Audit Logging** - Track all super admin activities
+- ✅ **Role-Based Access** - Super Admin, Admin, Manager, and Staff portals
 
 ### 📊 Currently Completed Features
 
-#### Admin Portal Features
+#### Super Admin Portal Features (TuloTech Africa)
+1. **System Dashboard** - Organization-wide statistics
+   - Total companies managed
+   - Total employees across all companies
+   - Active financial years
+   - Pending year-end processes
+
+2. **Company Management**
+   - Create unlimited companies
+   - Configure regional tax settings (Namibia/South Africa)
+   - Set financial year cycles
+   - Monitor company statistics
+   - Audit log access
+
+3. **System Configuration**
+   - Tax configuration management
+   - Financial year management
+   - Year-end process initiation
+   - Audit trail monitoring
+
+#### Regional Tax Compliance
+
+**Namibian Tax Implementation (2024):**
+- ✅ PAYE (Pay As You Earn) - Progressive tax brackets:
+  - N$0 - N$50,000: 0%
+  - N$50,001 - N$100,000: 18%
+  - N$100,001 - N$300,000: 25% (+ N$9,000 fixed)
+  - N$300,001 - N$500,000: 28% (+ N$59,000 fixed)
+  - N$500,001 - N$800,000: 30% (+ N$115,000 fixed)
+  - Above N$800,000: 37% (+ N$205,000 fixed)
+- ✅ Social Security Contribution (SSC):
+  - Employee: 0.9% (max N$81,000/month)
+  - Employer: 0.9% (max N$81,000/month)
+
+**South African Tax Implementation (2024/2025):**
+- ✅ PAYE (Pay As You Earn) - Progressive tax brackets:
+  - R0 - R237,100: 18%
+  - R237,101 - R370,500: 26% (+ R42,678 fixed)
+  - R370,501 - R512,800: 31% (+ R77,362 fixed)
+  - R512,801 - R673,000: 36% (+ R121,475 fixed)
+  - R673,001 - R857,900: 39% (+ R179,147 fixed)
+  - Above R857,900: 41% (+ R251,258 fixed)
+- ✅ UIF (Unemployment Insurance Fund):
+  - Employee: 1% (max R17,712/month)
+  - Employer: 1% (max R17,712/month)
+- ✅ SDL (Skills Development Levy):
+  - Employer: 1% of payroll
+
+#### Year-End Functions
+1. **Financial Year Cycles**
+   - Create and manage financial years
+   - Track year status (planning, active, closed, archived)
+   - Year-end closing process
+
+2. **Year-End Processes**
+   - Tax submission preparation
+   - Annual leave rollover
+   - Performance review cycles
+   - Salary review processes
+   - Audit and archiving
+
+3. **Leave Balance Management**
+   - Annual leave accrual tracking
+   - Year-end rollover with carryover limits
+   - Leave expiry management
+
+4. **Salary History Tracking**
+   - Track all salary changes
+   - Percentage increase calculations
+   - Approval workflow
+   - Historical reporting
+
+#### Admin Portal Features (Company Level)
 1. **Dashboard** - Real-time statistics and overview
    - Total employees count
    - Present today count
@@ -123,10 +203,10 @@
 ### Database Schema (Cloudflare D1 SQLite)
 
 **Core Tables:**
-1. **companies** - Multi-tenant company information
+1. **companies** - Multi-tenant company information with regional settings
 2. **users** - Staff and admin accounts with role-based access
 3. **attendance** - Clock-in/out records with timestamps
-4. **payslips** - Salary slips with detailed calculations
+4. **payslips** - Salary slips with automated tax calculations
 5. **leave_requests** - Leave applications and approvals
 6. **calendar_events** - Events, holidays, meetings
 7. **messages** - Internal communications
@@ -136,6 +216,16 @@
 11. **performance_reviews** - Performance tracking
 12. **motivational_quotes** - Daily motivation system
 
+**Enhanced Tables (Super Admin & Year-End):**
+13. **financial_years** - Year cycles and status tracking
+14. **tax_configurations** - Regional tax settings (Namibia/SA)
+15. **year_end_processes** - Year-end workflows
+16. **annual_tax_submissions** - Tax filing records
+17. **employee_tax_certificates** - IRP5/Tax certificates
+18. **leave_balances** - Leave accrual and rollover
+19. **salary_history** - Salary change tracking
+20. **audit_logs** - Super admin activity logs
+
 ### Data Flow
 1. **Authentication** → Role-based routing (Admin/Staff)
 2. **Admin Actions** → Database modifications → Real-time updates
@@ -144,15 +234,25 @@
 
 ## 🔐 Demo Credentials
 
-### Admin Access
+### Super Admin Access (TuloTech Africa)
 - **Email**: admin@tulotech.com
 - **Password**: admin123
-- **Permissions**: Full system access
+- **Permissions**: Full system control, all companies, tax configuration, year-end processes
+- **Company Type**: Super Administrator
 
-### Manager Access
+### Company Admin Access (Swakopmund Christian Academy)
 - **Email**: manager@sca.edu.na
 - **Password**: manager123
-- **Permissions**: HR management, approvals
+- **Permissions**: Company HR management, approvals
+- **Country**: Namibia
+- **Tax Regime**: Namibian PAYE + SSC
+
+### Company Admin Access (Cape Town International School)
+- **Email**: admin@ctis.co.za
+- **Password**: admin123
+- **Permissions**: Company HR management
+- **Country**: South Africa
+- **Tax Regime**: South African PAYE + UIF + SDL
 
 ### Staff Access
 - **Email**: john.doe@sca.edu.na
@@ -255,19 +355,24 @@ npm run deploy
 ## 📊 System Statistics
 
 ### Database Records
-- **Companies**: 1 (Swakopmund Christian Academy)
-- **Users**: 4 (1 Admin, 1 Manager, 2 Staff)
+- **Companies**: 2 (TuloTech Africa Super Admin + Cape Town International School)
+- **Primary Company**: Swakopmund Christian Academy (Namibia)
+- **Users**: 5 (1 Super Admin, 1 Manager, 3 Staff across companies)
+- **Tax Configurations**: 2 (Namibia + South Africa)
+- **Financial Years**: 3 (across all companies)
 - **Attendance Records**: Sample data included
 - **Calendar Events**: 4 initial events
 - **Motivational Quotes**: 10 quotes
 - **Announcements**: 1 welcome announcement
+- **Leave Balances**: Initialized for current year
 
 ### Code Metrics
-- **Backend Routes**: 40+ API endpoints
+- **Backend Routes**: 60+ API endpoints (including super admin and tax APIs)
 - **Frontend Components**: Fully modular architecture
-- **Database Tables**: 12 comprehensive tables
+- **Database Tables**: 20 comprehensive tables (enhanced)
 - **JavaScript Files**: 4 organized modules
-- **Total Code**: ~6,300+ lines
+- **Total Code**: ~9,500+ lines
+- **Tax Calculators**: 2 regional implementations (Namibia, South Africa)
 
 ## 🛡️ Security Features
 
