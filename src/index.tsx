@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { serveStatic } from 'hono/cloudflare-workers'
 import { renderer } from './renderer'
+import { addSuperAdminRoutes, calculateTaxDeductions } from './enhanced-routes'
 import type { D1Database } from '@cloudflare/workers-types'
 
 type Bindings = {
@@ -18,6 +19,9 @@ app.use(renderer)
 
 // Enable CORS for all API routes
 app.use('/api/*', cors())
+
+// Add enhanced super admin routes
+addSuperAdminRoutes(app)
 
 // Helper function to get current user from session (simplified - in production use JWT)
 async function getCurrentUser(c: any, email: string) {
@@ -384,14 +388,44 @@ app.post('/api/payslips', async (c) => {
   try {
     const data = await c.req.json()
     
+    // Get company info for tax calculations
+    const company = await c.env.DB.prepare(
+      'SELECT country FROM companies WHERE id = ?'
+    ).bind(data.company_id).first()
+    
+    const country = company?.country || 'Namibia'
+    
     // Calculate gross salary
     const gross_salary = parseFloat(data.basic_salary) + 
                         parseFloat(data.allowances || 0) + 
                         parseFloat(data.bonuses || 0) +
                         parseFloat(data.overtime_pay || 0)
     
+    // Auto-calculate tax deductions if not provided
+    let tax_deduction = parseFloat(data.tax_deduction || 0)
+    let ssc_deduction = 0
+    let uif_deduction = 0
+    
+    if (data.auto_calculate_tax) {
+      const taxCalc = calculateTaxDeductions(
+        parseFloat(data.basic_salary),
+        country,
+        parseFloat(data.bonuses || 0)
+      )
+      
+      tax_deduction = taxCalc.monthlyPAYE
+      
+      if (country === 'Namibia') {
+        ssc_deduction = taxCalc.ssc_employee
+      } else if (country === 'South Africa') {
+        uif_deduction = taxCalc.uif_employee
+      }
+    }
+    
     // Calculate total deductions
-    const total_deductions = parseFloat(data.tax_deduction || 0) +
+    const total_deductions = tax_deduction +
+                            ssc_deduction +
+                            uif_deduction +
                             parseFloat(data.insurance_deduction || 0) +
                             parseFloat(data.pension_deduction || 0) +
                             parseFloat(data.other_deductions || 0)
@@ -417,7 +451,7 @@ app.post('/api/payslips', async (c) => {
       data.overtime_hours || 0,
       data.overtime_pay || 0,
       gross_salary,
-      data.tax_deduction || 0,
+      tax_deduction,
       data.insurance_deduction || 0,
       data.pension_deduction || 0,
       data.other_deductions || 0,
@@ -434,6 +468,9 @@ app.post('/api/payslips', async (c) => {
       success: true, 
       id: result.meta.last_row_id,
       gross_salary,
+      tax_deduction,
+      ssc_deduction,
+      uif_deduction,
       total_deductions,
       net_salary
     })
