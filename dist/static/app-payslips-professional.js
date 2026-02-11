@@ -468,3 +468,11 @@ async function getPayslipTemplate(companyId) {
     return null
   }
 }
+
+// ===== EXPOSE FUNCTIONS GLOBALLY =====
+window.showGeneratePayslipModalEnhanced = showGeneratePayslipModalEnhanced
+window.viewPayslipDetailsProfessional = viewPayslipDetailsProfessional
+window.downloadPayslipPDFProfessional = downloadPayslipPDFProfessional
+window.emailPayslipProfessional = emailPayslipProfessional
+window.printPayslipProfessional = printPayslipProfessional
+window.getPayslipTemplate = getPayslipTemplate

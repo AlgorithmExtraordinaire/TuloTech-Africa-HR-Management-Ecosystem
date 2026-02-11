@@ -339,6 +339,269 @@ async function showStaffAttendanceView() {
   `
 }
 
+// ===== MISSING FUNCTIONS =====
+
+// Add manual attendance entry
+function showAddAttendanceModal() {
+  const today = new Date().toISOString().split('T')[0]
+  
+  showModal(`
+    <h3 class="text-2xl font-bold mb-4">Manual Attendance Entry</h3>
+    <form id="add-attendance-form" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Select Employee</label>
+        <select name="user_id" required class="w-full px-3 py-2 border rounded-lg">
+          <option value="">Choose employee...</option>
+          ${state.users.filter(u => u.role === 'staff').map(user => `
+            <option value="${user.id}">${user.first_name} ${user.last_name} (${user.employee_id})</option>
+          `).join('')}
+        </select>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+        <input type="date" name="date" value="${today}" required class="w-full px-3 py-2 border rounded-lg">
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Clock In</label>
+          <input type="time" name="clock_in" required class="w-full px-3 py-2 border rounded-lg">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Clock Out (Optional)</label>
+          <input type="time" name="clock_out" class="w-full px-3 py-2 border rounded-lg">
+        </div>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+        <select name="status" required class="w-full px-3 py-2 border rounded-lg">
+          <option value="present">Present</option>
+          <option value="late">Late</option>
+          <option value="absent">Absent</option>
+          <option value="half-day">Half Day</option>
+        </select>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+        <textarea name="notes" rows="2" class="w-full px-3 py-2 border rounded-lg"></textarea>
+      </div>
+      
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+        Save Attendance
+      </button>
+    </form>
+  `)
+  
+  document.getElementById('add-attendance-form').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    const data = Object.fromEntries(formData)
+    
+    // Construct datetime strings
+    data.clock_in = `${data.date}T${data.clock_in}:00`
+    if (data.clock_out) {
+      data.clock_out = `${data.date}T${data.clock_out}:00`
+    }
+    data.company_id = state.currentUser.company_id
+    
+    try {
+      await apiCall('/api/attendance', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      })
+      showToast('Attendance record added successfully!')
+      closeModal()
+      await showAttendanceManagement()
+    } catch (error) {
+      // Error already shown by apiCall
+    }
+  })
+}
+
+// View user details
+async function viewUserDetails(userId) {
+  const user = state.users.find(u => u.id === userId)
+  if (!user) {
+    showToast('User not found', 'error')
+    return
+  }
+  
+  showModal(`
+    <h3 class="text-2xl font-bold mb-4">Employee Details</h3>
+    <div class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <p class="text-gray-900">${user.first_name} ${user.last_name}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Employee ID</label>
+          <p class="text-gray-900">${user.employee_id}</p>
+        </div>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <p class="text-gray-900">${user.email}</p>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+          <p class="text-gray-900">${user.department || 'N/A'}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+          <p class="text-gray-900">${user.position || 'N/A'}</p>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Salary</label>
+          <p class="text-gray-900">${formatCurrency(user.salary)}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <p class="text-gray-900">
+            <span class="px-2 py-1 text-xs rounded ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+              ${user.is_active ? 'Active' : 'Inactive'}
+            </span>
+          </p>
+        </div>
+      </div>
+      
+      ${user.phone ? `
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+          <p class="text-gray-900">${user.phone}</p>
+        </div>
+      ` : ''}
+      
+      ${user.address ? `
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+          <p class="text-gray-900">${user.address}</p>
+        </div>
+      ` : ''}
+      
+      ${user.bank_name ? `
+        <div class="bg-blue-50 p-4 rounded-lg">
+          <h4 class="font-bold text-blue-900 mb-2">Banking Details</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Bank</label>
+              <p class="text-gray-900">${user.bank_name}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Branch Code</label>
+              <p class="text-gray-900">${user.branch_code}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+              <p class="text-gray-900">${user.account_number}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Account Holder</label>
+              <p class="text-gray-900">${user.account_holder}</p>
+            </div>
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `)
+}
+
+// Edit user
+async function editUser(userId) {
+  const user = state.users.find(u => u.id === userId)
+  if (!user) {
+    showToast('User not found', 'error')
+    return
+  }
+  
+  showModal(`
+    <h3 class="text-2xl font-bold mb-4">Edit Employee</h3>
+    <form id="edit-user-form" class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+          <input type="text" name="first_name" value="${user.first_name}" required class="w-full px-3 py-2 border rounded-lg">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+          <input type="text" name="last_name" value="${user.last_name}" required class="w-full px-3 py-2 border rounded-lg">
+        </div>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input type="email" name="email" value="${user.email}" required class="w-full px-3 py-2 border rounded-lg">
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+          <input type="text" name="department" value="${user.department || ''}" class="w-full px-3 py-2 border rounded-lg">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+          <input type="text" name="position" value="${user.position || ''}" class="w-full px-3 py-2 border rounded-lg">
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Salary</label>
+          <input type="number" name="salary" value="${user.salary || 0}" step="0.01" class="w-full px-3 py-2 border rounded-lg">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+          <input type="tel" name="phone" value="${user.phone || ''}" class="w-full px-3 py-2 border rounded-lg">
+        </div>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+        <input type="text" name="address" value="${user.address || ''}" class="w-full px-3 py-2 border rounded-lg">
+      </div>
+      
+      <div>
+        <label class="flex items-center space-x-2">
+          <input type="checkbox" name="is_active" ${user.is_active ? 'checked' : ''} class="rounded">
+          <span class="text-sm font-medium text-gray-700">Active Employee</span>
+        </label>
+      </div>
+      
+      <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+        Update Employee
+      </button>
+    </form>
+  `)
+  
+  document.getElementById('edit-user-form').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    const data = Object.fromEntries(formData)
+    data.is_active = formData.has('is_active') ? 1 : 0
+    
+    try {
+      await apiCall(`/api/users/${userId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+      })
+      showToast('Employee updated successfully!')
+      closeModal()
+      await showStaffManagement()
+    } catch (error) {
+      // Error already shown by apiCall
+    }
+  })
+}
+
 // ===== MODAL HELPER =====
 function showModal(content) {
   const modal = document.createElement('div')

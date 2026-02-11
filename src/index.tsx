@@ -446,22 +446,22 @@ app.post('/api/payslips', async (c) => {
       data.company_id,
       data.month,
       data.year,
-      data.basic_salary,
-      data.allowances || 0,
-      data.bonuses || 0,
-      data.overtime_hours || 0,
-      data.overtime_pay || 0,
+      parseFloat(data.basic_salary),
+      parseFloat(data.allowances || 0),
+      parseFloat(data.bonuses || 0),
+      parseFloat(data.overtime_hours || 0),
+      parseFloat(data.overtime_pay || 0),
       gross_salary,
       tax_deduction,
-      data.insurance_deduction || 0,
-      data.pension_deduction || 0,
-      data.other_deductions || 0,
+      parseFloat(data.insurance_deduction || 0),
+      parseFloat(data.pension_deduction || 0),
+      parseFloat(data.other_deductions || 0),
       total_deductions,
       net_salary,
-      data.payment_date,
-      data.payment_method,
-      data.bank_account,
-      data.notes,
+      data.payment_date || null,
+      data.payment_method || 'Bank Transfer',
+      data.bank_account || null,
+      data.notes || null,
       data.generated_by
     ).run()
     
@@ -476,7 +476,8 @@ app.post('/api/payslips', async (c) => {
       net_salary
     })
   } catch (error) {
-    return c.json({ error: 'Failed to create payslip' }, 500)
+    console.error('Payslip creation error:', error)
+    return c.json({ error: 'Failed to create payslip', details: error.message }, 500)
   }
 })
 
