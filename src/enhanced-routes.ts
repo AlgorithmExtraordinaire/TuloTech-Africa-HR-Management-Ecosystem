@@ -561,4 +561,48 @@ export function addSuperAdminRoutes(app: any) {
       return c.json({ error: 'Failed to add salary change' }, 500)
     }
   })
+  
+  // ===== PAYSLIP TEMPLATE ROUTES =====
+  
+  // Get payslip template for company
+  app.get('/api/payslip-template', async (c: any) => {
+    try {
+      const companyId = c.req.query('company_id')
+      
+      const template = await c.env.DB.prepare(`
+        SELECT * FROM payslip_templates WHERE company_id = ? LIMIT 1
+      `).bind(companyId).first()
+      
+      return c.json({ template: template || {} })
+    } catch (error) {
+      return c.json({ error: 'Failed to fetch template' }, 500)
+    }
+  })
+  
+  // Update payslip template
+  app.put('/api/payslip-template/:id', async (c: any) => {
+    try {
+      const id = c.req.param('id')
+      const data = await c.req.json()
+      
+      await c.env.DB.prepare(`
+        UPDATE payslip_templates SET
+          template_name = ?,
+          header_color = ?,
+          company_motto = ?,
+          show_registration = ?
+        WHERE id = ?
+      `).bind(
+        data.template_name,
+        data.header_color,
+        data.company_motto,
+        data.show_registration,
+        id
+      ).run()
+      
+      return c.json({ success: true })
+    } catch (error) {
+      return c.json({ error: 'Failed to update template' }, 500)
+    }
+  })
 }

@@ -12,10 +12,10 @@ async function showPayslipsManagement() {
         <h1 class="text-3xl font-bold text-gray-800 mb-2">
           <i class="fas fa-money-bill-wave mr-3 text-green-600"></i>Payslips Management
         </h1>
-        <p class="text-gray-600">Generate and manage employee payslips</p>
+        <p class="text-gray-600">Generate and manage employee payslips with professional templates</p>
       </div>
-      <button onclick="showGeneratePayslipModal()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors shadow-lg">
-        <i class="fas fa-plus mr-2"></i>Generate Payslip
+      <button onclick="showGeneratePayslipModalEnhanced()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors shadow-lg">
+        <i class="fas fa-plus mr-2"></i>Generate Professional Payslip
       </button>
     </div>
     
@@ -42,10 +42,10 @@ async function showPayslipsManagement() {
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatCurrency(payslip.basic_salary)}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">${formatCurrency(payslip.net_salary)}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <button onclick="viewPayslipDetails(${payslip.id})" class="text-blue-600 hover:text-blue-800 mr-3">
+                  <button onclick="viewPayslipDetailsProfessional(${payslip.id})" class="text-blue-600 hover:text-blue-800 mr-3">
                     <i class="fas fa-eye"></i>
                   </button>
-                  <button onclick="downloadPayslipPDF(${payslip.id})" class="text-green-600 hover:text-green-800">
+                  <button onclick="downloadPayslipPDFProfessional(${payslip.id})" class="text-green-600 hover:text-green-800">
                     <i class="fas fa-download"></i>
                   </button>
                 </td>
@@ -304,10 +304,10 @@ async function showStaffPayslipsView() {
             </div>
             
             <div class="mt-6 flex space-x-2">
-              <button onclick="viewPayslipDetails(${payslip.id})" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm">
+              <button onclick="viewPayslipDetailsProfessional(${payslip.id})" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm">
                 <i class="fas fa-eye mr-1"></i>View
               </button>
-              <button onclick="downloadPayslipPDF(${payslip.id})" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 text-sm">
+              <button onclick="downloadPayslipPDFProfessional(${payslip.id})" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 text-sm">
                 <i class="fas fa-download mr-1"></i>Download
               </button>
             </div>

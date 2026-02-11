@@ -34,6 +34,7 @@ export const renderer = jsxRenderer(({ children }) => {
         <script src="/static/app.js"></script>
         <script src="/static/app-views.js"></script>
         <script src="/static/app-payslips.js"></script>
+        <script src="/static/app-payslips-professional.js"></script>
         <script src="/static/app-calendar.js"></script>
       </body>
     </html>

@@ -367,6 +367,7 @@ app.get('/api/payslips/:id', async (c) => {
     const id = c.req.param('id')
     const payslip = await c.env.DB.prepare(`
       SELECT p.*, u.first_name, u.last_name, u.employee_id, u.department, u.position, u.phone, u.address,
+             u.bank_name, u.branch_code, u.account_number, u.account_holder,
              c.name as company_name, c.organization_name, c.address as company_address, c.contact_email, c.contact_phone
       FROM payslips p
       JOIN users u ON p.user_id = u.id
